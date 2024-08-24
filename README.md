@@ -1,66 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Bootstrap no Laravel 10 com Vite
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Node.js**: É necessário ter o Node.js instalado. Quando o Node.js é instalado, o NPM também é instalado automaticamente.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Estrutura de Arquivos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Todos os arquivos CSS e JS devem ser criados no diretório `resources`, localizado na raiz do projeto.
 
-## Learning Laravel
+## Instalação das Dependências
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Após a instalação do Laravel, execute o comando abaixo para instalar as dependências do Vite que estão listadas no arquivo `package.json`:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Dica**: Evite importar o CSS dentro do arquivo JS para não causar lentidão.
 
-## Laravel Sponsors
+## Instalação do Bootstrap
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Instale o Bootstrap utilizando o comando:
 
-### Premium Partners
+```bash
+npm i bootstrap
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+O Bootstrap será instalado no diretório `node_modules/bootstrap/dist`.
 
-## Contributing
+## Configuração do Vite
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+No arquivo `vite.config.js`, podemos criar apelidos (aliases) para os diretórios onde o Bootstrap e o diretório `resources` estão localizados. Veja a configuração no objeto `resolve`:
 
-## Code of Conduct
+```javascript
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import path from 'path';
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
 
-## Security Vulnerabilities
+    resolve: {
+        alias: {
+            "@": "/resources/js",
+            '~bootstrap': path.resolve(__dirname, "node_modules/bootstrap/dist")
+        }
+    },
+});
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Importações nos Arquivos JS e CSS
 
-## License
+### JavaScript
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+No arquivo `app.js`, localizado em `resources/js/app.js`, você pode realizar as importações da seguinte maneira:
+
+```javascript
+import '@/bootstrap';
+import '~bootstrap/js/bootstrap.bundle.min.js';
+```
+
+### CSS
+
+No arquivo `app.css`, localizado em `resources/css/app.css`, você pode realizar as importações assim:
+
+```css
+@import url("~bootstrap/css/bootstrap.min.css");
+```
+
+## Teste em Modo de Desenvolvimento
+
+Para testar em modo de desenvolvimento, insira o seguinte código no `<head>` do HTML da view master da aplicação para importar os recursos:
+
+```blade
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+```
+
+O Vite possui hot reload, ou seja, as alterações realizadas nos arquivos CSS e JS serão automaticamente atualizadas no navegador.
+
+Para que o Vite funcione em modo de desenvolvimento, abra um terminal e execute o comando:
+
+```bash
+npm run dev
+```
+
+## Testando com Bootstrap
+
+Crie uma view utilizando classes do Bootstrap para realizar os testes e verificar se os estilos estão sendo aplicados corretamente.
+
+## Compilação para Produção
+
+Quando estiver pronto para trabalhar em modo de produção, será necessário compilar os assets. Para isso, execute o comando abaixo, que irá compilar os assets para dentro da pasta `public`, na raiz do projeto:
+
+```bash
+npm run build
+```
+
+Após a compilação, altere a chamada dos assets na view. Por exemplo:
+
+### Para CSS:
+
+```html
+<link rel="stylesheet" href="{{ asset('build/assets/app-5f3ded15.css') }}">
+```
+
+### Para JavaScript:
+
+```html
+<script src="{{ asset('build/assets/app-ba970431.js') }}"></script>
+```
+
+A função `asset()` retorna os arquivos do diretório `public`.
